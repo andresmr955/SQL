@@ -60,3 +60,41 @@ SELECT TOP 3 client AS 'Nom Client' FROM Commande ORDER BY (Prix_U * Qte);
 --Q6: Combinaisons:
 --Listez les produits distincts commandés en 2024, triés par nom
 SELECT DISTINCT Produit FROM Commande WHERE DateCommande Between '2024/01/01' AND '2024/12/31' ORDER BY Produit
+
+--Exercise 2
+SELECT * 
+FROM Commande;
+-- 1. Sélectionner tous les noms distincts des clients qui ont passé une commande. On ne doit pas avoir de doublons dans la liste.
+SELECT DISTINCT Client 
+FROM Commande;
+
+-- 2. Afficher toutes les informations des commandes pour le produit nommé "Montre connectée". Trier les résultats par la date de 
+-- commande, de la plus récente à la plus ancienne.
+SELECT * 
+FROM Commande
+WHERE Produit LIKE '%Montre connectée%'
+ORDER BY DateCommande DESC;
+-- 3. Trouver toutes les commandes où la quantité est supérieure à 1. On doit afficher le nom du client, le nom du produit, et la quantité.
+SELECT  Client 'Nom du client',
+		Produit 'Nom du produit',
+		Qte 'Quantité'
+FROM Commande
+WHERE Qte > 1
+
+-- 4. Afficher le nom de chaque produit commandé avec son prix unitaire, mais uniquement pour les commandes passées en 2023. On inclut 
+-- uniquement les produits dont le prix unitaire est supérieur à 50 $. On limite le résultat aux 2 premiers produits ayant les prix les plus élevés.
+
+SELECT TOP 2 WITH TIES Client, Produit, Prix_U
+FROM Commande
+WHERE DateCommande BETWEEN '2023-01-01' AND '2023-12-31' AND Prix_U > 50
+ORDER BY Prix_U DESC;
+
+-- 5. Afficher toutes les informations des commandes passées entre 2023-12-27 et 2024-01-05 qui ont été achetées avec un code promo. On doit trier 
+-- le résultat par nom et par quantité.
+
+SELECT * 
+FROM Commande
+SELECT *
+FROM Commande
+WHERE DateCommande BETWEEN  '2023-12-27' AND '2024-01-05' AND CodePromo IS NOT NULL
+ORDER BY Client, Qte
