@@ -1,85 +1,71 @@
---DROP DATABASE IF EXISTS AgregationDonnes;
---CREATE DATABASE AgregationDonnes;
-USE AgregationDonnes;
+-- Table unique pour tous les exemples de tri
+CREATE DATABASE PRESENTATIONDONNEES;
+USE PRESENTATIONDONNEES;
+GO;
+DROP TABLE IF EXISTS Employes;
 GO
-DROP TABLE IF EXISTS eleves;
-
-CREATE TABLE eleves (
-    id INT PRIMARY KEY,
-    nom VARCHAR(100) NOT NULL,
-    sexe char(1) CHECK(sexe IN ('F','M')),
-    programme VARCHAR(100),
-    noteExamen1 DECIMAL(5, 2),
-    noteExamen2 DECIMAL(5, 2)
-   
+CREATE TABLE Employes (
+    EmployeID INT PRIMARY KEY,
+    Nom VARCHAR(50),
+    Prenom VARCHAR(50),
+    Poste VARCHAR(50),
+    Salaire DECIMAL(10,2),
+    Departement VARCHAR(30),
+    DateEmbauche DATE
 );
 
-INSERT INTO eleves (id, nom, sexe, programme, noteExamen1, noteExamen2) 
-VALUES 
-    (1, 'Alice Dupont', 'F', 'Informatique', 66.5, 80.5),
-    (2, 'Bob Martin', 'M', 'Génie électrique', 55.0, 73.0),
-    (3, 'Claire Lemaire', 'F', 'Multimedia', 86.0, 78.5),
-    (4, 'David Durand', 'M', 'Informatique', 92.0, 83.5),
-    (5, 'Eva Lambert', 'F', 'Informatique', 68.5, 84.0),
-    (6, 'Annie Leroy', 'F', 'Multimedia', 90.0, 87.5),
-    (7, 'Valdislav Koval', 'M', 'Informatique', 84.5, 87.0),
-    (8, 'Niko Petra', 'F', 'Informatique', 73.0, 71.0);
--- 1. Sélectionner tous les élèves et afficher leur nom et leur 
--- NoteFinale=(noteExamen1 + noteExamen2)/2, avec la NoteFinale arrondie à 
--- l'entier le plus proche.
-SELECT CAST(4.88 AS INT 1)
-SELECT nom, CAST(ROUND((noteExamen1 + noteExamen1)/2,0) AS INT)  NoteFinal FROM eleves;
-SELECT * FROM eleves;
+INSERT INTO Employes VALUES
+(1, 'Martin', 'Jean', 'Développeur', 65000, 'Informatique', '2022-03-15'),
+(2, 'Gagnon', 'Marie', 'Analyste', 58000, 'Informatique', '2021-09-01'),
+(3, 'Roy', 'Pierre', 'Chef de projet', 75000, 'Informatique', '2020-01-10'),
+(4, 'Tremblay', 'Sophie', 'Designer', 52000, 'Marketing', '2023-05-20'),
+(5, 'Leblanc', 'Marc', 'Comptable', 48000, 'Finance', '2019-11-30'),
+(6, 'Dubois', 'Julie', 'Directrice', 95000, 'Direction', '2018-04-12');
 
-DECLARE @notemax DECIMAL(5,2)
-SELECT @notemax= MAX((noteExamen1 + noteExamen2) /2) FROM eleves;
-SELECT @notemax
+SELECT * FROM Employes;
+-- Renommer une colonne simple
+SELECT Nom 'Nom de famille' FROM Employes;
+-- Plusieurs alias
+SELECT Nom 'Nom de famille', 
+	   Prenom 'Votre Prenom',
+	   Poste AS "Votre Poste",
+	   Departement AS [Votre departement]
+FROM Employes;
 
-SELECT * FROM eleves 
-WHERE @notemax = CAST((noteExamen1 + noteExamen2) / 2 AS DECIMAL(5,2));
+--Alias pour des calculs et concaténations
+SELECT nom + ' '+  Prenom AS [Nom Complet], Salaire * 12 "Salaire Annuel" FROM Employes;
 
-DECLARE @noteLimite decimal(5,2);
-SET @noteLimite = 70
-SELECT * 
-FROM eleves
-WHERE noteExamen1 > @noteLimite;
--- 6- Afficher les noms et moyenne des étudiants ayant eu
--- une note finale supérieure à la moyenne générale 
+--ORDER BY permet de trier les résultats selon une ou plusieurs colonnes.
 
-DECLARE @avgGeneral decimal (5,2);
---La media del salon de clases es:
-SELECT AVG((noteExamen1 + noteExamen2) / 2.0) FROM eleves;
+SELECT * FROM Employes ORDER BY Nom;
+SELECT * FROM Employes ORDER BY salaire DESC;
+SELECT * FROM Employes ORDER BY DateEmbauche;
 
-DECLARE @MoyenneGenerale DECIMAL(5,2);
-SET @MoyenneGenerale = (SELECT AVG((noteExamen1 + noteExamen2) / 2.0) FROM eleves);
-SELECT @MoyenneGenerale
+SELECT * FROM Employes ORDER BY Departement ASC, Salaire DESC;
+SELECT * FROM Employes ORDER BY Poste, DateEmbauche DESC;
+SELECT Nom AS 'x nom' FROM Employes ORDER BY [x nom];
 
-SELECT nom, CAST(AVG((noteExamen1 + noteExamen2) / 2 )AS DECIMAL(5,2)) AS 'AVG Total' 
-FROM eleves 
-GROUP BY nom
-HAVING AVG((noteExamen1 + noteExamen2) / 2.0) > @MoyenneGenerale 
+--DISTINCT élimine les lignes en double des résultats.
 
---7- Afficher le nombre d'étudiants inscrits et la moyenne des notes
---finales de chaque programme 
-SELECT 
-programme, COUNT(*), AVG((noteExamen1 + noteExamen1) / 2.0) 'Note final'
-FROM eleves
-GROUP BY programme;
-;
---8- Afficher les noms des programmes où la moyenne des notes finales 
--- des étudiants est inférieure à 75.
-SELECT programme,
-CAST(AVG((noteExamen1 + noteExamen2) / 2 )AS DECIMAL(5,2)) AS 'AVG Total'
-FROM eleves
-GROUP BY programme
-HAVING AVG((noteExamen1 + noteExamen1) / 2.0) < 75;
+SELECT * FROM Employes;
+SELECT DISTINCT Departement FROM Employes;
 
--- 9- Afficher les noms des programmes où le nombre de femmes est inférieur à 2.
-SELECT 
-programme, count(*) AS 'NombreFemmes'
-FROM eleves
-WHERE sexe = 'F'
-GROUP BY programme
-HAVING count(*) < 2;
+INSERT INTO Employes VALUES
+(7, 'Andres', 'Marquez', 'Développeur', 80000 ,'Informatique', '2018-08-12'),
+(8, 'Melodie', 'Bareno', 'Analyste', 100000, 'Marketing', '2022-04-12');
 
-;
+SELECT * FROM Employes;
+
+UPDATE Employes
+SET Nom = 'Marquez',
+	Prenom = 'Andres'
+WHERE EmployeId = 7;
+SELECT * FROM Employes;
+
+UPDATE Employes
+SET Nom = 'Benavides',
+	Prenom = 'Melodie'
+WHERE EmployeId = 8;
+SELECT * FROM Employes;
+
+SELECT DISTINCT Departement FROM Employes;
