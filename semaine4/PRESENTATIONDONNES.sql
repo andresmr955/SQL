@@ -244,3 +244,66 @@ SELECT  TOP 5
 FROM Commande1
 WHERE DateCommande >= '2024-01-01'
 ORDER BY Prix_U * Qte DESC;
+
+--Exemple 2: Analyse des départements
+
+DROP TABLE IF EXISTS Employes6;
+GO
+CREATE TABLE Employes6 (
+    EmployeID INT PRIMARY KEY,
+    Nom VARCHAR(50),
+    Prenom VARCHAR(50),
+    Departement VARCHAR(30)
+);
+
+INSERT INTO Employes6 VALUES
+(1, 'Martin', 'Jean', 'Informatique'),
+(2, 'Gagnon', 'Marie', 'Informatique'),
+(3, 'Roy', 'Pierre', 'Informatique'),
+(4, 'Tremblay', 'Sophie', 'Marketing'),
+(5, 'Leblanc', 'Marc', 'Finance'),
+(6, 'Dubois', 'Julie', 'Marketing');
+
+SELECT * FROM Employes6;
+SELECT 
+	Departement AS "Departement",
+	COUNT(*) AS "Nombre d'employees"
+FROM Employes6
+GROUP BY Departement
+ORDER BY COUNT(*) DESC;
+
+-- Exemple 3: TOP clients
+-- Table pour exemple top clients
+DROP TABLE IF EXISTS Commande2;
+GO
+CREATE TABLE Commande2 (
+    CommandeID INT PRIMARY KEY,
+    Client VARCHAR(100),
+    Produit VARCHAR(100),
+    Prix_U DECIMAL(10,2)
+);
+
+INSERT INTO Commande2 VALUES
+(1, 'Alice Bonnet', 'Table Vision 8', 179.99),
+(2, 'Bob Martin', 'Camera GoPro', 300.99),
+(3, 'Diane Caron', 'Montre Premium', 450.99),
+(4, 'Paul Durand', 'Laptop Pro', 1299.99),
+(5, 'Marie Claire', 'Smartphone', 899.99),
+(6, 'Jean Leblanc', 'Casque Audio', 150.99);
+
+-- Les 3 clients ayant passé les commandes les plus chères (plus de 200 $)
+SELECT * FROM Commande2;
+SELECT TOP 3 WITH TIES  
+	Client AS "Meilleurs clients",
+    Prix_U AS "Prix ($)"
+FROM Commande2
+WHERE Prix_U > 200
+ORDER BY Client DESC
+
+UPDATE Commande2
+SET Prix_U = 450.99
+WHERE CommandeID = 4
+
+UPDATE Commande2
+SET Prix_U = 1299.99
+WHERE CommandeID = 3
