@@ -48,7 +48,8 @@ SELECT Nom AS 'x nom' FROM Employes ORDER BY [x nom];
 --DISTINCT élimine les lignes en double des résultats.
 
 SELECT * FROM Employes;
-SELECT DISTINCT Departement FROM Employes;
+SELECT DISTINCT Departement, * FROM Employes;
+SELECT DISTINCT Departement FROM Employes ORDER BY Departement;
 
 INSERT INTO Employes VALUES
 (7, 'Andres', 'Marquez', 'Développeur', 80000 ,'Informatique', '2018-08-12'),
@@ -67,5 +68,179 @@ SET Nom = 'Benavides',
 	Prenom = 'Melodie'
 WHERE EmployeId = 8;
 SELECT * FROM Employes;
+--DISTINCT sur plusieurs colonnes
+DROP TABLE IF EXISTS Employes2;
+go
+CREATE TABLE Employes2 (
+    EmployeID INT PRIMARY KEY,
+    Nom VARCHAR(50),
+    Departement VARCHAR(30),
+    Poste VARCHAR(50)
+);
 
-SELECT DISTINCT Departement FROM Employes;
+INSERT INTO Employes2 VALUES
+(1, 'Martin', 'Informatique', 'Développeur'),
+(2, 'Gagnon', 'Informatique', 'Analyste'),
+(3, 'Roy', 'Informatique', 'Développeur'),
+(4, 'Tremblay', 'Marketing', 'Designer'),
+(5, 'Leblanc', 'Marketing', 'Designer');
+
+-- Lister toutes les combinaisons département-poste
+SELECT * FROM Employes2;
+SELECT DISTINCT Departement, Poste FROM Employes2;
+
+--DISTINCT avec ORDER BY
+
+DROP TABLE IF EXISTS Employes;
+GO
+CREATE TABLE Employes3 (
+    EmployeID INT PRIMARY KEY,
+    Nom VARCHAR(50),
+    Departement VARCHAR(30),
+    Poste VARCHAR(50),
+    ville VARCHAR(50)
+);
+
+INSERT INTO Employes3 VALUES
+(1, 'Martin', 'Informatique', 'Développeur','Montréal'),
+(2, 'Gagnon', 'Informatique', 'Analyste','Montréal'),
+(3, 'Roy', 'Informatique', 'Chef de projet','Québec'),
+(4, 'Tremblay', 'Marketing', 'Designer','Sherbrooke'),
+(5, 'Leblanc', 'Finance', 'Comptable','Québec'),
+(6, 'Dubois', 'Marketing', 'Designer','Trois-Rivières');
+
+-- Départements triés alphabétiquement
+
+SELECT * FROM Employes3;
+SELECT DISTINCT Departement FROM Employes3 ORDER BY Departement;
+
+--DISTINCT avec WHERE
+-- Table pour DISTINCT avec WHERE
+DROP TABLE IF EXISTS Commande;
+GO
+CREATE TABLE Commande (
+    CommandeID INT PRIMARY KEY,
+    Client VARCHAR(100),
+    Produit VARCHAR(100)
+);
+
+INSERT INTO Commande VALUES
+(1, 'Alice Bonnet', 'Casque Bluetooth'),
+(2, 'Bob Martin', 'Camera GoPro'),
+(3, 'Alain Dupont', 'Enceinte Bluetooth'),
+(4, 'Diane Caron', 'Montre connectée'),
+(5, 'Alice Bonnet', 'Casque Bluetooth'),
+(6, 'Bob Martin', 'Enceinte Bluetooth');
+
+-- Clients ayant commandé des produits Bluetooth
+SELECT * FROM Commande;
+SELECT Client FROM Commande WHERE Produit LIKE '%Bluetooth%'
+SELECT DISTINCT Client FROM Commande WHERE Produit LIKE '%Bluetooth%'
+SELECT * FROM Commande;
+
+SELECT DISTINCT Client
+FROM Commande
+ORDER BY Client;
+
+--TOP limite le nombre de lignes retournées par la requête.
+
+DROP TABLE IF EXISTS Employes4;
+GO
+CREATE TABLE Employes4 (
+    EmployeID INT PRIMARY KEY,
+    Nom VARCHAR(50),
+    Prenom VARCHAR(50),
+    Salaire DECIMAL(10,2),
+    DateEmbauche DATE
+);
+
+INSERT INTO Employes4 VALUES
+(1, 'Martin', 'Jean', 65000, '2022-03-15'),
+(2, 'Gagnon', 'Marie', 58000, '2021-09-01'),
+(3, 'Roy', 'Pierre', 75000, '2020-01-10'),
+(4, 'Tremblay', 'Sophie', 52000, '2023-05-20'),
+(5, 'Leblanc', 'Marc', 48000, '2019-11-30'),
+(6, 'Dubois', 'Julie', 95000, '2018-04-12'),
+(7, 'Lavoie', 'Paul', 62000, '2021-06-10'),
+(8, 'Moreau', 'Anne', 71000, '2022-08-25'),
+(9, 'Girard', 'Luc', 54000, '2023-01-15'),
+(10, 'Caron', 'Sylvie', 67000, '2020-12-08');
+
+-- Les 3 premiers employés (ordre arbitraire)
+SELECT * FROM Employes4;
+SELECT TOP 3 * FROM Employes4;
+-- La moitié de la table
+SELECT TOP 50 PERCENT * FROM Employes4;
+
+--TOP avec ORDER BY (Important)
+DROP TABLE IF EXISTS Employes;
+GO
+CREATE TABLE Employes5 (
+    EmployeID INT PRIMARY KEY,
+    Nom VARCHAR(50),
+    Prenom VARCHAR(50),
+    Salaire DECIMAL(10,2),
+    DateEmbauche DATE
+);
+
+INSERT INTO Employes5 VALUES
+(1, 'Martin', 'Jean', 65000, '2022-03-15'),
+(2, 'Gagnon', 'Marie', 58000, '2021-09-01'),
+(3, 'Roy', 'Pierre', 75000, '2020-01-10'),
+(4, 'Tremblay', 'Sophie', 52000, '2023-05-20'),
+(5, 'Leblanc', 'Marc', 48000, '2019-11-30'),
+(6, 'Dubois', 'Julie', 95000, '2018-04-12'),
+(7, 'Lavoie', 'Paul', 62000, '2021-06-10'),
+(8, 'Moreau', 'Anne', 71000, '2022-08-25'),
+(9, 'Girard', 'Luc', 54000, '2023-01-15'),
+(10, 'Caron', 'Sylvie', 67000, '2020-12-08');
+
+
+-- Les 3 employés les mieux payés
+SELECT * FROM Employes5
+SELECT * FROM Employes5 ORDER BY Salaire DESC;
+
+SELECT TOP 3 * FROM Employes5 ORDER BY Salaire DESC;
+-- Les 5 employés embauchés le plus récemment
+SELECT TOP 5 * FROM Employes5 ORDER BY DateEmbauche DESC;
+SELECT * FROM Employes5
+-- Les 20% des employés les mieux payés
+SELECT * FROM Employes5 ORDER BY Salaire DESC; 
+SELECT TOP 20 PERCENT * FROM Employes5 ORDER BY Salaire DESC; 
+-- Égalités : WITH TIES
+INSERT INTO Employes5 VALUES (11, 'Bouchard', 'Lise', 71000, '2024-02-01');
+SELECT TOP 3 WITH TIES Nom, Salaire FROM Employes5 ORDER BY Salaire DESC; 
+
+--- EXAMPLE COMPLET
+
+-- Table complète pour exemple avancé
+DROP TABLE IF EXISTS Commande;
+GO
+CREATE TABLE Commande1 (
+    CommandeID INT PRIMARY KEY,
+    Client VARCHAR(100),
+    Produit VARCHAR(100),
+    Qte INT,
+    Prix_U DECIMAL(10,2),
+    DateCommande DATE
+);
+
+INSERT INTO Commande1 VALUES
+(1, 'Alice Bonnet', 'Table Vision 8', 2, 179.99, '2024-01-15'),
+(2, 'Bob Martin', 'Camera GoPro', 1, 300.99, '2024-01-20'),
+(3, 'Alain Dupont', 'Montre connectée', 3, 69.99, '2024-01-22'),
+(4, 'Diane Caron', 'Enceinte Bluetooth', 2, 129.99, '2024-01-25'),
+(5, 'Joanne Leroy', 'Casque Premium', 1, 450.99, '2024-01-28'),
+(6, 'Paul Martin', 'Tablette Pro', 1, 599.99, '2024-01-30'),
+(7, 'Marie Claire', 'Smartphone', 2, 899.99, '2024-02-02');
+
+SELECT  * FROM Commande1;
+SELECT  TOP 5
+		Client AS 'Nom du client',
+		Produit AS 'Produit acheté',
+		Qte AS 'Quantité',
+		Prix_U AS 'Prix unitaire ($)',
+		Prix_U * Qte AS 'Total ($)'
+FROM Commande1
+WHERE DateCommande >= '2024-01-01'
+ORDER BY Prix_U * Qte DESC;
