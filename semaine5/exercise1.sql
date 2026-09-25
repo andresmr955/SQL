@@ -65,3 +65,6 @@ SELECT *,
 CAST(ROUND((noteExamen1 + noteExamen2) / 2, 2) AS DECIMAL(5,2)) AS NoteFinal
 FROM eleves_exercise1
 WHERE CAST(ROUND((noteExamen)) DECIMAL (5,2))
+--Puis je cree un variable avec un recherche pour ne pas repèter?
+
+
