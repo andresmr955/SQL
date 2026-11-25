@@ -1,68 +1,120 @@
--- 1. Creación de tablas
-CREATE TABLE etudiants (
-    id_etudiant INT PRIMARY KEY,
+--- Suppression des tables si elles existent déjà
+DROP TABLE IF EXISTS TravailleSur;
+--GO
+DROP TABLE IF EXISTS Employe;
+--GO
+DROP TABLE IF EXISTS Projet;
+--GO
+DROP TABLE IF EXISTS  Departement;
+GO
+SELECT * FROM TravailleSur
+SELECT * FROM Employe
+SELECT * FROM Projet
+SELECT * FROM Departement
+
+-- Création de la table Departement
+CREATE TABLE Departement (
+    departementID INT PRIMARY KEY,
+    nom VARCHAR(100) NOT NULL
+);
+
+-- Création de la table Employe
+-- gestionnaireID : clé étrangère auto-référente (le gestionnaire est lui-même un employé)
+CREATE TABLE Employe (
+    employeID INT PRIMARY KEY,
     nom VARCHAR(100) NOT NULL,
-    ville VARCHAR(80) NOT NULL
+    prenom VARCHAR(100),
+    departementID INT,
+    gestionnaireID INT,
+    FOREIGN KEY (departementID) REFERENCES Departement(departementID),
+    FOREIGN KEY (gestionnaireID) REFERENCES Employe(employeID)
 );
 
-CREATE TABLE cours (
-    id_cours INT PRIMARY KEY,
-    titre VARCHAR(120) NOT NULL,
-    departement VARCHAR(80) NOT NULL
+-- Création de la table Projet
+CREATE TABLE Projet (
+    projetID INT PRIMARY KEY,
+    nomProjet VARCHAR(100) NOT NULL,
+    description VARCHAR(1000)
 );
 
-CREATE TABLE inscriptions (
-    id_inscription INT PRIMARY KEY,
-    id_etudiant INT NOT NULL,
-    id_cours INT NOT NULL,
-    statut VARCHAR(20) NOT NULL,
-    CONSTRAINT fk_insc_etudiant FOREIGN KEY (id_etudiant) REFERENCES etudiants(id_etudiant),
-    CONSTRAINT fk_insc_cours FOREIGN KEY (id_cours) REFERENCES cours(id_cours)
+-- Création de la table TravailleSur
+CREATE TABLE TravailleSur (
+    employeID INT,
+    projetID INT,
+    role VARCHAR(100),
+    PRIMARY KEY (employeID, projetID),
+    FOREIGN KEY (employeID) REFERENCES Employe(employeID),
+    FOREIGN KEY (projetID) REFERENCES Projet(projetID)
 );
 
-CREATE TABLE evaluations (
-    id_evaluation INT PRIMARY KEY,
-    id_inscription INT NOT NULL,
-    type_eval VARCHAR(40) NOT NULL,
-    note DECIMAL(5, 2) NOT NULL,
-    CONSTRAINT fk_eval_inscription FOREIGN KEY (id_inscription) REFERENCES inscriptions(id_inscription)
-);
+-- Insertion de données dans Departement
+INSERT INTO Departement (departementID, nom) VALUES
+(1, 'Informatique'),
+(2, 'Ressources Humaines'),
+(3, 'Marketing'),
+(4, 'Finance');
 
--- 2. Inserción de datos de prueba
-INSERT INTO etudiants (id_etudiant, nom, ville) VALUES
-(1, 'Camille Laurent', 'Montréal'),
-(2, 'Mateo Rojas', 'Laval'),
-(3, 'Sofía Navarro', 'Longueuil'),
-(4, 'Lucas Tremblay', 'Montréal'); -- Sin ninguna inscripción
+-- Insertion de données dans Employe (les gestionnaires d'abord)
+INSERT INTO Employe (employeID, nom, prenom, departementID, gestionnaireID) VALUES
+(1, 'Dupont', 'Jean', 1, NULL),
+(2, 'Martin', 'Alice', 2, NULL),
+(3, 'Lefebvre', 'Marie', 1, 1),
+(4, 'Bernard', 'Luc', 3, 2),
+(5, 'Girard', 'Sophie', 1, 3),
+(6, 'Roy', 'Karim', NULL, 2);
 
-INSERT INTO cours (id_cours, titre, departement) VALUES
-(101, 'Bases de données', 'Informatique'),
-(102, 'Systèmes d''exploitation', 'Informatique'),
-(103, 'Algèbre linéaire', 'Mathématiques'),
-(104, 'Rédaction technique', 'Communication'); -- Sin estudiantes inscritos
+-- Insertion de données dans Projet
+INSERT INTO Projet (projetID, nomProjet, description) VALUES
+(1, 'Projet Alpha', 'Description du Projet Alpha'),
+(2, 'Projet Beta', 'Description du Projet Beta'),
+(3, 'Projet Gamma', 'Description du Projet Gamma'),
+(4, 'Projet Delta', 'Description du Projet Delta');
 
-INSERT INTO inscriptions (id_inscription, id_etudiant, id_cours, statut) VALUES
-(10, 1, 101, 'actif'),      -- Camille en Bases de données (con evaluación)
-(20, 1, 102, 'abandonne'),  -- Camille en Systèmes d'exploitation (abandonado, sin evaluación)
-(30, 2, 101, 'actif'),      -- Mateo en Bases de données (con evaluación)
-(40, 3, 103, 'actif');      -- Sofía en Algèbre linéaire (sin evaluación aún)
+-- Insertion de données dans TravailleSur
+INSERT INTO TravailleSur (employeID, projetID, role) VALUES
+(1, 1, 'Chef de projet'),
+(2, 2, 'Analyste'),
+(3, 1, 'Développeur'),
+(3, 2, 'Développeur'),
+(3, 3, 'Développeur'),
+(5, 3, 'Testeur');
 
-INSERT INTO evaluations (id_evaluation, id_inscription, type_eval, note) VALUES
-(1001, 10, 'Examen intra', 88.50),
-(1002, 10, 'Projet final', 92.00),
-(1003, 30, 'Examen intra', 76.00);
+-- Notes sur les données :
+-- Le département 4 (Finance) n'a aucun employé.
+-- L'employé 6 (Karim Roy) n'a pas de département.
+-- Les employés 4 et 6 ne sont associés à aucun projet.
+-- Le projet 4 (Projet Delta) n'a aucun employé.
+-- Jean Dupont et Alice Martin n'ont pas de gestionnaire (gestionnaireID NULL).
 
-SELECT E.nom, C.titre, EV.note
-FROM etudiants E
-INNER JOIN inscriptions I
-	ON E.id_etudiant = I.id_etudiant
-INNER JOIN cours C
-	ON I.id_cours = C.id_cours
-INNER JOIN evaluations  EV
-	ON I.id_inscription = EV.id_inscription
+-- Employés et départements (alias, tri)
+-- Afficher le prénom, le nom et le nom du département de chaque employé, 
+-- triés par département puis par nom. Utilisez des alias de table. 
+-- Pourquoi Karim Roy n'apparaît-il pas dans le résultat ?
+-- Parce que Karim n'a pas DepartementID
+SELECT E.prenom as prenomEmployee, E.nom as nomEmploye, D.nom as NomDepartament
+FROM Employe E 
+INNER JOIN Departement D
+	ON E.departementID = D.departementID
+ORDER BY NomDepartament, nomEmploye
 
-SELECT *
-FROM etudiants E
-LEFT JOIN inscriptions I 
-	ON E.id_etudiant = I.id_etudiant
-WHERE I.id_inscription IS NULL
+-- Nombre d'employés par département
+-- Pour chaque département, afficher son nom et son nombre d'employés. 
+-- Le département Finance, qui n'a aucun employé, doit afficher 0. 
+-- Attention : COUNT(*) compte aussi une ligne remplie de NULL.
+
+SELECT D.nom, COUNT(E.nom) AS NbEmployees 
+FROM Departement D
+LEFT JOIN Employe E
+	ON D.departementID = E.departementID
+GROUP BY D.nom
+
+-- Projets sans employés
+-- Trouver les projets auxquels aucun employé n'est assigné.
+
+SELECT P.nomProjet, E.nom
+FROM Projet P
+LEFT JOIN TravailleSur TS
+	ON P.projetID = TS.employeID
+LEFT JOIN Employe E
+	ON TS.employeID = E.employeID
+WHERE E.nom IS NULL
