@@ -111,11 +111,10 @@ INNER JOIN Inscriptions I
 INNER JOIN Abonnements A
 	ON I.AbonnementID = A.AbonnementID
 ORDER BY Rabais DESC
-=======
+-- Andres
 -- Question 4 
 -- Question 5 
 -- Question 6 
 -- Question 7 
 -- Question 8 
 
->>>>>>> 23042447330de94524ee3f80ad74e9816c089469
