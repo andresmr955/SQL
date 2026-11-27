@@ -171,15 +171,4 @@ INSERT INTO Participations (ParticipationID, MembreID, CoursID, DateParticipatio
 
 GO
 
-SELECT * FROM Inscriptions
-WHERE StatutPaiement = 'En attente'
-
-UPDATE Inscriptions
-SET StatutPaiement = 'Payé'
-WHERE StatutPaiement = 'En attente'
-
-
-SELECT * FROM Inscriptions
-WHERE StatutPaiement = 'En attente'
-
 
